@@ -87,7 +87,7 @@ class State
     moving_two_items = @floors[@elevator].items.permutations(2).map { |items_in_elevator|
       [move_items_up(items_in_elevator), move_items_down(items_in_elevator)]
     }.flatten
-    (moving_one_item + moving_two_items).flatten.compact.select(&.valid?).to_set.to_a
+    (moving_one_item + moving_two_items).flatten.compact.select(&.valid?).to_set
   end
 
   def end?
@@ -188,6 +188,14 @@ class SolveNode
     @dead = false
   end
 
+  def hash
+    @state.hash
+  end
+
+  def ==(other)
+    @state == other.state
+  end
+
   def dead?
     @dead
   end
@@ -215,12 +223,12 @@ class SolveTree
     puts "Starting search of depth: #{depth_index}"
     puts "  Nodes: #{current_depth.size}"
     puts ""
-    next_depth = [] of SolveNode
+    next_depth = Set(SolveNode).new
     current_depth.each do |node|
       if yield node
         return depth_index, node
       end
-      next_depth.concat(node.children) unless node.dead?
+      next_depth.merge!(node.children) unless node.dead?
       # if node.dead?
       #   print "x"
       # else
