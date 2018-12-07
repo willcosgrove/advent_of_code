@@ -6,7 +6,7 @@ class ExpansionPattern
   end
 
   def ===(other)
-    @pattern == other || permutations.any?(other)
+    @pattern == other || permutations.any? { |mutated_pattern| mutated_pattern == other }
   end
 
   def permutations
@@ -16,11 +16,14 @@ class ExpansionPattern
       rotate_cw,
       rotate_cw(times: 2),
       rotate_cw(times: 3),
+      mirror_x(rotate_cw),
+      mirror_y(rotate_cw),
     ]
   end
 
   def to_s
-    @pattern.map(&:join).join("\n")
+    # @pattern.map(&:join).join("\n")
+    [@pattern, *permutations].map(&:inspect).join("\n")
   end
 
   private
@@ -70,6 +73,13 @@ art_board = <<~ART.split("\n").map { |row| row.chomp.split("") }
   ###
 ART
 
+# ep = ExpansionPattern.new(art_board)
+# puts ep
+# ep.permutations.each do |permutation|
+#   puts ""
+#   puts ExpansionPattern.new(permutation)
+# end
+
 rules = STDIN.each_line.map { |line| ExpansionRule.from_line(line) }
 ifnone = -> (pattern) { -> { puts "Nothing matches #{pattern.inspect}" } }
 
@@ -86,5 +96,5 @@ rules.each { |rule| puts rule.pattern; puts "" }
         .map { |sub_art_board| rules.find(ifnone.(sub_art_board)) { |rule| rule === sub_art_board }.mapping }
         .transpose
         .map(&:flatten)
-    }
+    }.inspect
 end
