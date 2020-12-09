@@ -59,20 +59,11 @@
 
 boarding_pass_codes = STDIN.each_line.to_a
 
-def decode_boarding_pass(boarding_pass)
-  row = boarding_pass[0...7].tr("FB", "01").to_i(2)
-  column = boarding_pass[7..].tr("LR", "01").to_i(2)
-
-  {row, column}
+def seat_id(boarding_pass)
+  boarding_pass.tr("FBLR", "0101").to_i(2)
 end
 
-def seat_id(row, column)
-  (row * 8) + column
-end
-
-seat_ids = boarding_pass_codes.map { |bp|
-  seat_id(*decode_boarding_pass(bp))
-}
+seat_ids = boarding_pass_codes.map { |boarding_pass| seat_id(boarding_pass) }
 
 highest_seat_id = seat_ids.max
 
